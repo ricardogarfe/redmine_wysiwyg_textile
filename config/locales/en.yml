@@ -19,3 +19,7 @@ en:
   permission_answer_doodles: "Answer doodles"
   text_doodle_answered: "{{author}} answered the doodle."
   text_doodle_with_requested_answer: "{{author}} requests that you answer this doodle."
+  
+  field_default_editor: "Default editor"
+  label_wysiwyg: "WYSIWYG editor"
+  label_textile: "Simple editor"
