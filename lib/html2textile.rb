@@ -24,15 +24,19 @@ class HTMLToTextileParser < SGMLParser
   attr_accessor :a_href
   attr_accessor :in_ul
   attr_accessor :in_ol
+  attr_accessor :list_stack
+  attr_accessor :list
   
   @@permitted_tags = ["pre", "code"]
-  @@permitted_attrs = []
+  @@permitted_attrs = ["class"]
   
   def initialize(verbose=nil)
     @output = String.new
     self.in_block = false
     self.result = []
     self.data_stack = []
+    self.list_stack = []
+    self.list = ""
     super(verbose)
   end
   
@@ -42,20 +46,21 @@ class HTMLToTextileParser < SGMLParser
     s.to_s.gsub(/\s+/x, ' ')
   end
   
-  def build_styles_ids_and_classes(attributes)
-    idclass = ''
-    idclass += attributes['class'] if attributes.has_key?('class')
-    idclass += "\##{attributes['id']}" if attributes.has_key?('id')
-    idclass = "(#{idclass})" if idclass != ''
-    
-    style = attributes.has_key?('style') ? "{#{attributes['style']}}" : ""
-    "#{idclass}#{style}"
-  end
+#  def build_styles_ids_and_classes(attributes)
+#    idclass = ''
+#    idclass += attributes['class'] if attributes.has_key?('class')
+#    idclass += "\##{attributes['id']}" if attributes.has_key?('id')
+#    idclass = "(#{idclass})" if idclass != ''
+#    
+#    style = attributes.has_key?('style') ? "{#{attributes['style']}}" : ""
+#    "#{idclass}#{style}"
+#  end
   
   def make_block_start_pair(tag, attributes)
     attributes = attrs_to_hash(attributes)
-    class_style = build_styles_ids_and_classes(attributes)
-    write("#{tag}#{class_style}. ")
+    #class_style = build_styles_ids_and_classes(attributes)
+    #write("#{tag}#{class_style}. ")
+    write("#{tag}. ")
     start_capture(tag)
   end
   
@@ -66,14 +71,59 @@ class HTMLToTextileParser < SGMLParser
   
   def make_quicktag_start_pair(tag, wrapchar, attributes)
     attributes = attrs_to_hash(attributes)
-    class_style = build_styles_ids_and_classes(attributes)
-    write([" ", "#{wrapchar}#{class_style}"])
+    write([" #{wrapchar}"])
+    start_capture(tag)
+  end
+  
+  def make_removetag_start_pair(tag, wrapchar, attributes)
+    attributes = attrs_to_hash(attributes)
+    write(["#{wrapchar}"])
     start_capture(tag)
   end
 
   def make_quicktag_end_pair(wrapchar)
+    content = self.data_stack.pop
+    #puts content.inspect
+    content = content.join("")
+    content.gsub!(/\n+/, "\n")
+    content.strip!
+    #puts content.inspect
+    #puts content.inspect
+    self.data_stack.push([content])
+    
     stop_capture_and_write
-    write([wrapchar, " "])
+    write(["#{wrapchar.strip} ", " "])
+    
+    content = self.data_stack.pop
+    unless content.nil?
+      #puts content.inspect
+      content = content.join("")
+      content.gsub!(/\n+/, "\n")
+      #content.strip!
+      #puts content.inspect
+      self.data_stack.push([content])
+    end
+  end
+  
+  def make_removetag_end_pair(wrapchar)
+    content = self.data_stack.pop
+    content = content.join(" ")
+    content.gsub!(/\n+/, "\n")
+    content.strip!
+    self.data_stack.push([content])
+    
+    stop_capture_and_write
+    write(["#{wrapchar}"])
+    
+    content = self.data_stack.pop
+    unless content.nil?
+      #puts content.inspect
+      content = content.join("")
+      content.gsub!(/\n+/, "\n")
+      #content.strip!
+      #puts content.inspect
+      self.data_stack.push([content])
+    end
   end
   
   def write(d)
@@ -112,8 +162,10 @@ class HTMLToTextileParser < SGMLParser
   PAIRS = { 'blockquote' => 'bq' } # p removed 14/10/10
   QUICKTAGS = { 'b' => '*', 'strong' => '*', 
     'i' => '_', 'em' => '_', 'cite' => '??', 's' => '-', 
-    'sup' => '^', 'sub' => '~', 'code' => '@', 'span' => '%',
-    'del' => '-', 'ins' => '+','pre' => 'pre', 'p' => ''} # p added 14/10/10
+    'sup' => '^', 'sub' => '~', 'code' => 'code', 'span' => '%',
+    'del' => '-', 'ins' => '+','pre' => 'pre'}
+  REMOVETAGS = { 'p' => '',  # p added 14/10/10
+    'span' => '', 'div' => '', 'u' => ''}
   
   PAIRS.each do |key, value|
     define_method "start_#{key}" do |attributes|
@@ -135,37 +187,51 @@ class HTMLToTextileParser < SGMLParser
     end
   end
   
+  REMOVETAGS.each do |key, value|
+    define_method "start_#{key}" do |attributes|
+      make_removetag_start_pair(key, value, attributes)
+    end
+    
+    define_method "end_#{key}" do
+      make_removetag_end_pair(value)
+    end
+  end
+  
   def start_ol(attrs)
-    self.in_ol = true
+    self.list = "#"
+    self.list_stack.push("#")
   end
 
   def end_ol
-    self.in_ol = false
-    write("\n")
+    current = self.list_stack.pop
+    puts "AAAH" if current != "#"
+    self.list = self.list_stack.pop
+    self.list_stack.push(self.list)
+    write("\n\n") if self.list_stack.size == 0
   end
 
   def start_ul(attrs)
-    self.in_ul = true
+    self.list = "*"
+    self.list_stack.push("*")
   end
 
   def end_ul
-    self.in_ul = false
-    write("\n")
+    current = self.list_stack.pop
+    puts "AAAH" if current != "*"
+    self.list = self.list_stack.pop
+    self.list = "" if self.list.nil?
+    self.list_stack.push(self.list) if self.list != ""
+    write("\n\n") if self.list_stack.size == 0
   end
   
   def start_li(attrs)
-    if self.in_ol
-      write("# ")
-    else
-      write("* ")
-    end
-    
+    o =  "\n" + (self.list.to_s * self.list_stack.size) + " "
+    write(o)
     start_capture("li")
   end
 
   def end_li
     stop_capture_and_write
-    write("\n")
   end
 
   def start_a(attrs)
@@ -173,7 +239,7 @@ class HTMLToTextileParser < SGMLParser
     self.a_href = attrs['href']
 
     if self.a_href:
-      write(" \"")
+      write("\"")
       start_capture("a")
     end
   end
@@ -210,7 +276,16 @@ class HTMLToTextileParser < SGMLParser
   end
 
   def end_pre
-    write("\n</pre>\n\n")
+    write("\n</pre>\n")
+  end
+  
+  def start_code(attrs)
+    attrs = attrs_to_hash(attrs)
+    write("<code class=\"#{attrs['class']}\">\n")
+  end
+
+  def end_code
+    write("\n</code>")
   end
   
   def start_tr(attrs)
@@ -221,13 +296,50 @@ class HTMLToTextileParser < SGMLParser
   end
 
   def start_td(attrs)
-    write("|")
+    cs = get_colspan(attrs)
+    rs = get_rowspan(attrs)
+    cs = "" unless cs
+    rs = "" unless rs
+    spans = ""
+    spans = "#{cs}#{rs}." unless cs == "" and rs == ""
+    write("|#{spans}")
     start_capture("td")
+  end
+  
+  def get_colspan(attrs)
+    for attr in attrs
+      return "\\#{attr[1]}" if attr[0] == "colspan"
+   end
+   return nil
+  end
+  
+  def get_rowspan(attrs)
+    for attr in attrs
+      return "/#{attr[1]}" if attr[0] == "rowspan"
+    end
+    return nil
   end
 
   def end_td
+    #replace newline with space
+    content = self.data_stack.pop
+    #content.gsub(/\n/x, ' [[BR]] ')
+    #puts content.inspect
+    content = content.join("")
+    content.gsub!(/\n+/, "\n")
+    #puts content.inspect
+    self.data_stack.push([content])
     stop_capture_and_write
     #write("|")
+  end
+  
+  def start_table(attrs)
+    start_capture("table")
+  end
+  
+  def end_table
+    write("\n\n")
+    stop_capture_and_write
   end
 
   def start_br(attrs)
@@ -253,7 +365,7 @@ class HTMLToTextileParser < SGMLParser
   
   # Return the textile after processing
   def to_textile
-    result.join
+    result.join.gsub(/\n /, "\n")
   end
   
   # UNCONVERTED PYTHON METHODS

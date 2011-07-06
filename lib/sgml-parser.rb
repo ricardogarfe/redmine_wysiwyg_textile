@@ -1,5 +1,4 @@
 # A parser for SGML, using the derived class as static DTD.
-
 class SGMLParser
 
   # Regular expressions used for parsing:
@@ -25,7 +24,34 @@ class SGMLParser
                             '|[-~a-zA-Z0-9,./:+*%?!()_#=]*))?')
 
   Entitydefs =
-    {'lt'=>'<', 'gt'=>'>', 'amp'=>'&', 'quot'=>'"', 'apos'=>'\''}
+    {'lt'=>'<', 'gt'=>'>', 'amp'=>'&', 'quot'=>'"', 'apos'=>'\'',
+    'rsquo' => '\'',
+    '#39' => '\'',
+    'nbsp' => ' ',
+    'ouml' => 'ö', 'Ouml' => 'Ö', 'uuml' => 'ü', 'Uuml' => 'Ü',
+    'auml' => 'ä', 'Auml' => 'Ä', 'szlig' => 'ß',
+    'Ccedil' => 'Ç',
+    'ecirc' => 'ê',
+    'acirc' => 'â',
+    'atilde' => 'ã',
+    'aring' => 'å',
+    'aelig' => 'æ',
+    'agrave' => 'à',
+    'aacute' => 'á',
+    'Ugrave' => 'Ù',
+    'Uacute' => 'Ú',
+    'icirc' => 'î',
+    'iuml' => 'ï',
+    'ntilde' => 'ñ',
+    'ocirc' => 'ô',
+    'ograve' => 'ò',
+    'oacute' => 'ó',
+    'otilde' => 'õ',
+    'ugrave' => 'ù',
+    'uacute' => 'ú',
+    'ucirc' => 'û',
+    'yacute' => 'ý'
+    }
 
   def initialize(verbose=false)
     @verbose = verbose
@@ -254,7 +280,8 @@ class SGMLParser
         end
         return
       end
-      found = @stack.index(tag) #or @stack.length
+      found = @stack.size - (@stack.reverse.index(tag)+1)
+      #found = @stack.index(tag) #or @stack.length
     end
     while @stack.length > found
       tag = @stack[-1]
@@ -321,8 +348,10 @@ class SGMLParser
   end
 
   def unknown_starttag(tag, attrs)
+    puts "Unknown starttag #{tag}"
   end
   def unknown_endtag(tag)
+    puts "Unknown starttag #{tag}"
   end
   def unknown_charref(ref)
   end
@@ -330,4 +359,3 @@ class SGMLParser
   end
 
 end
-

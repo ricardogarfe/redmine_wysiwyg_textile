@@ -53,7 +53,8 @@ class ConvertController < ApplicationController
   unloadable
       
   def wysiwygtohtmltotextile
-    @text = params[:content][:text] 
+    #@text=params[:content][:text]
+    @text = params[:convert_content] 
     # name="content[text]" --- wiki page
     # name="issue[description]" -- issue
     # name="notes" -- note
@@ -67,10 +68,11 @@ class ConvertController < ApplicationController
   end
   
   def wysiwygtotextiletohtml
-    @text=params[:content][:text]
+    #@text=params[:content][:text]
+    @text = params[:convert_content] 
     #@text=RedCloth3.new(params[:content][:text]).to_html
     #@text = @text.gsub(/(\r?\n|\r\n?)/, "\n> ") + "\n\n"
-    @text=HTMLFormatter.new(@text).to_html
+    @text=HTMLFormatter.new(@text).to_html if @text
     render :partial => 'convert'
   end
 end
