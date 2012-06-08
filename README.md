@@ -1,6 +1,8 @@
 Redmine Wysiwyg Textile Editor
 =================
 
+Forked from https://github.com/stefan-langenmaier/redmine_wysiwyg_textile to get it working for redmine 2.01.
+
 A TinyMCE test application for Textile wiki pages.
 
 Currently this is a test version for in-house use only since there is a few issues that need to be sorted out regarding the conversion to and from textile and other security issues. If you stick to simple textile formatting it's not a problem, but when it comes to images and macros that's another issue.
