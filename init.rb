@@ -5,7 +5,13 @@
 #
 require 'redmine'
 
-RAILS_DEFAULT_LOGGER.info 'Starting Wysiwyg Textile for Redmine'
+# ActiveSupport::Dependencies.explicitly_unloadable_constants << 'RedmineWysiwygTextile'
+# ActiveSupport::Dependencies.autoload_once_paths.delete(File.expand_path(File.dirname(__FILE__))+'/plugins')
+
+def logger
+  Logger.new(STDERR)
+end
+logger.info 'Starting Wysiwyg Textile for Redmine'
 
 Redmine::Plugin.register :redmine_wysiwyg_textile do
     name 'Redmine Wysiwyg Textile'

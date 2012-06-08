@@ -64,7 +64,7 @@ class ConvertController < ApplicationController
     htmlparser = HTMLToTextileParser.new
     htmlparser.feed(@text)
     @text=htmlparser.to_textile
-    render :partial => 'convert'
+    render 'convert', :layout => false
   end
   
   def wysiwygtotextiletohtml
@@ -73,6 +73,6 @@ class ConvertController < ApplicationController
     #@text=RedCloth3.new(params[:content][:text]).to_html
     #@text = @text.gsub(/(\r?\n|\r\n?)/, "\n> ") + "\n\n"
     @text=HTMLFormatter.new(@text).to_html if @text
-    render :partial => 'convert'
+    render 'convert', :layout => false
   end
 end
