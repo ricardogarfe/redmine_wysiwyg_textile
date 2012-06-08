@@ -182,7 +182,7 @@ module RedmineWysiwygTextile
             <Input type = radio Name = \"textilewysiwyg\" #{User.current.preference.default_editor && User.current.preference.default_editor == 'wysiwyg' ? '' : 'CHECKED'} onClick=\"javascript:toggleEditor('#{field_id}',0)\">textile
             <Input type = radio Name = \"textilewysiwyg\" #{User.current.preference.default_editor && User.current.preference.default_editor == 'wysiwyg' ? 'CHECKED' : ''} onClick=\"javascript:toggleEditor('#{field_id}',1)\">wysiwyg
             
-            <div id='workarea' class='wiki'></div>" +
+            <div id='workarea' class='wiki'></div>".html_safe +
             javascript_tag("var the_jstoolbar = new jsToolBar($('#{field_id}'));
                     the_jstoolbar.setHelpLink('#{help_link}');
                     the_jstoolbar.draw();
