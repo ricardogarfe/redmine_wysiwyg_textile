@@ -1,3 +1,4 @@
+# encoding: utf-8
 # A parser for SGML, using the derived class as static DTD.
 class SGMLParser
 

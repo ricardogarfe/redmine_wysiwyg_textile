@@ -2,25 +2,19 @@
 # Redmine Wysiwyg Textile Editor
 #
 # P.J.Lawrence October 2010
+# Stefan Langenmaier 2011, 2012
 #
 require 'redmine'
 
-# ActiveSupport::Dependencies.explicitly_unloadable_constants << 'RedmineWysiwygTextile'
-# ActiveSupport::Dependencies.autoload_once_paths.delete(File.expand_path(File.dirname(__FILE__))+'/plugins')
-
-def logger
-  Logger.new(STDERR)
-end
-logger.info 'Starting Wysiwyg Textile for Redmine'
+#RAILS_DEFAULT_LOGGER.info 'Starting Wysiwyg Textile for Redmine'
 
 Redmine::Plugin.register :redmine_wysiwyg_textile do
     name 'Redmine Wysiwyg Textile'
-    author 'P.J. Lawrence'
+    author 'P.J. Lawrence, Stefan Langenmaier'
     description 'A TinyMCE test application for Textile wiki pages'
-    version '0.14'
+    version '0.15'
     
-    wiki_format_provider 'textile wysiwyg', RedmineWysiwygTextile::WikiFormatter, \
-                                             RedmineWysiwygTextile::Helper
+    wiki_format_provider 'textile wysiwyg', RedmineWysiwygTextile::WikiFormatter, RedmineWysiwygTextile::Helper
 end
 
 

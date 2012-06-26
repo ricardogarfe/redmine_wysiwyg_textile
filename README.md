@@ -1,8 +1,6 @@
 Redmine Wysiwyg Textile Editor
 =================
 
-Forked from https://github.com/stefan-langenmaier/redmine_wysiwyg_textile to get it working for redmine 2.01.
-
 A TinyMCE test application for Textile wiki pages.
 
 Currently this is a test version for in-house use only since there is a few issues that need to be sorted out regarding the conversion to and from textile and other security issues. If you stick to simple textile formatting it's not a problem, but when it comes to images and macros that's another issue.
@@ -12,7 +10,7 @@ A better option would be to write a javascript wysiwyg editor for redmine like t
 Installation
 ------------
 
-1. Copy the plugin directory into the vendor/plugins directory (make sure the name is redmine_wysiwyg_textile)
+1. Copy the plugin directory into the plugins directory (make sure the name is redmine_wysiwyg_textile)
 2. Start Redmine
 3. Change text formatting (Administration > Settings > General > Text formatting) to "textile wysiwyg"
                     
@@ -27,5 +25,7 @@ History
 14 Oct 2010 - v0.12 - preview now works in wysiwyg mode.
 14 Oct 2010 - v0.13 - preview now works for google chrome and IE
 14 Oct 2010 - v0.14 - removed P. from html to textile, replaced with just a return (\n)
+2011 - minor enhancements
+2012 - updated for redmine 2.0
 
     
