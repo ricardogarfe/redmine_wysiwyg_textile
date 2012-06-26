@@ -26,6 +26,9 @@ class HTMLToTextileParser < SGMLParser
   attr_accessor :in_ol
   attr_accessor :list_stack
   attr_accessor :list
+  attr_accessor :end_footnote
+  attr_accessor :in_sup
+  attr_accessor :in_footnote
   
   @@permitted_tags = ["pre", "code"]
   @@permitted_attrs = ["class"]
@@ -37,6 +40,9 @@ class HTMLToTextileParser < SGMLParser
     self.data_stack = []
     self.list_stack = []
     self.list = ""
+    self.end_footnote = false
+    self.in_sup = false
+    self.in_footnote = false
     super(verbose)
   end
   
@@ -164,8 +170,7 @@ class HTMLToTextileParser < SGMLParser
     'i' => '_', 'em' => '_', 'cite' => '??', 's' => '-', 
     'sup' => '^', 'sub' => '~', 'code' => 'code', 'span' => '%',
     'del' => '-', 'ins' => '+','pre' => 'pre'}
-  REMOVETAGS = { 'p' => '',  # p added 14/10/10
-    'span' => '', 'div' => '', 'u' => ''}
+  REMOVETAGS = {'span' => '', 'div' => '', 'u' => ''}
   
   PAIRS.each do |key, value|
     define_method "start_#{key}" do |attributes|
@@ -195,6 +200,44 @@ class HTMLToTextileParser < SGMLParser
     define_method "end_#{key}" do
       make_removetag_end_pair(value)
     end
+  end
+  
+  def start_p(attrs)
+    attrs = attrs_to_hash(attrs)
+    if attrs['class'] == "footnote"
+      self.end_footnote = true
+    end
+    start_capture("p")
+  end
+  
+  def end_p
+    self.end_footnote = false
+    stop_capture_and_write
+    write("\n\n")
+  end
+  
+  def start_sup(attrs)
+    if self.end_footnote
+      write(["fn"])
+    end
+    self.in_sup = true
+    start_capture("sup")
+  end
+  
+  def end_sup
+    self.in_sup = false
+    if !self.in_footnote && !self.end_footnote
+      write("^")
+    end
+    stop_capture_and_write
+    if self.in_footnote
+      write("]")
+    elsif self.end_footnote
+      write(". ")
+    else
+      write("^")
+    end
+    self.in_footnote = false
   end
   
   def start_ol(attrs)
@@ -237,18 +280,25 @@ class HTMLToTextileParser < SGMLParser
   def start_a(attrs)
     attrs = attrs_to_hash(attrs)
     self.a_href = attrs['href']
-
-    if self.a_href
-      write("\"")
-      start_capture("a")
+    if self.in_sup
+      self.in_footnote = true
+      write("[")
+      #start_capture("a")
+    else
+      if self.a_href
+        write("\"")
+        start_capture("a")
+      end
     end
   end
 
   def end_a
-    if self.a_href
-      stop_capture_and_write
-      write(["\":", self.a_href, " "])
-      self.a_href = false
+    unless self.in_footnote
+      if self.a_href
+        stop_capture_and_write
+        write(["\":", self.a_href, " "])
+        self.a_href = false
+      end
     end
   end
 
@@ -262,13 +312,6 @@ class HTMLToTextileParser < SGMLParser
   end
   
   def end_img
-  end
-
-  def start_p(attrs)
-  end
-
-  def end_p
-    write("\n\n")
   end
   
   def start_pre(attrs)
@@ -327,6 +370,7 @@ class HTMLToTextileParser < SGMLParser
     #puts content.inspect
     content = content.join("")
     content.gsub!(/\n+/, "\n")
+    content.gsub!(/\n$/, "")
     #puts content.inspect
     self.data_stack.push([content])
     stop_capture_and_write

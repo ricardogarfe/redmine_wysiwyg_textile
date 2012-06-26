@@ -8,7 +8,7 @@ module RedmineWysiwygTextile
     unloadable
     
     def wikitoolbar_for(field_id)
-      if (field_id!='notes')
+      unless (field_id=='notes' or field_id.match /journal.*/)
         # only for wiki pages for now
         wikitoolbar_for_wysiwyg(field_id)
       else

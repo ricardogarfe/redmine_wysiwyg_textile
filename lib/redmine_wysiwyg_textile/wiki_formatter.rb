@@ -4,7 +4,7 @@ module RedmineWysiwygTextile
         include ActionView::Helpers::TagHelper
         
         # auto_link rule after textile rules so that it doesn't break !image_url! tags
-        RULES = [:textile, :block_markdown_rule, :inline_auto_link, :inline_auto_mailto, :inline_toc]
+        RULES = [:textile, :block_markdown_rule, :inline_auto_link, :inline_auto_mailto]
         
         def initialize(*args)
           super
@@ -67,24 +67,24 @@ module RedmineWysiwygTextile
           textile_p(tag, atts, cite, content)
         end
   
-        alias :textile_h1 :textile_p_withtoc
-        alias :textile_h2 :textile_p_withtoc
-        alias :textile_h3 :textile_p_withtoc
+#        alias :textile_h1 :textile_p_withtoc
+#        alias :textile_h2 :textile_p_withtoc
+#        alias :textile_h3 :textile_p_withtoc
         
-        def inline_toc(text)
-          text.gsub!(/<p>\{\{([<>]?)toc\}\}<\/p>/i) do
-            div_class = 'toc'
-            div_class << ' right' if $1 == '>'
-            div_class << ' left' if $1 == '<'
-            out = "<ul class=\"#{div_class}\">"
-            @toc.each do |heading|
-              level, anchor, toc_item = heading
-              out << "<li class=\"heading#{level}\"><a href=\"##{anchor}\">#{toc_item}</a></li>\n"
-            end
-            out << '</ul>'
-            out
-          end
-        end
+#        def inline_toc(text)
+#          text.gsub!(/<p>\{\{([<>]?)toc\}\}<\/p>/i) do
+#            div_class = 'toc'
+#            div_class << ' right' if $1 == '>'
+#            div_class << ' left' if $1 == '<'
+#            out = "<ul class=\"#{div_class}\">"
+#            @toc.each do |heading|
+#              level, anchor, toc_item = heading
+#              out << "<li class=\"heading#{level}\"><a href=\"##{anchor}\">#{toc_item}</a></li>\n"
+#            end
+#            out << '</ul>'
+#            out
+#          end
+#        end
         
         AUTO_LINK_RE = %r{
                         (                          # leading text
