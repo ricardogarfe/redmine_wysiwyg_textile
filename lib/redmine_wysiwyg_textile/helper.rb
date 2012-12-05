@@ -199,6 +199,7 @@ module RedmineWysiwygTextile
     def heads_for_wiki_formatter
       unless @heads_for_wiki_formatter_included
         content_for :header_tags do
+          javascript_include_tag('/prototype/jscripts/prototype.js', :plugin => 'redmine_wysiwyg_textile') +
           javascript_include_tag('jstoolbar/jstoolbar') +
           javascript_include_tag('jstoolbar/textile') +
           javascript_include_tag("jstoolbar/lang/jstoolbar-#{current_language.to_s.downcase}") +
