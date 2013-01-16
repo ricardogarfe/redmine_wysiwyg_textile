@@ -1,15 +1,15 @@
-# encoding: utf-8
 # A parser for SGML, using the derived class as static DTD.
+
 class SGMLParser
 
   # Regular expressions used for parsing:
-  Interesting = /[&<]/
+  Interesting = /(<|&#?[a-zA-Z0-9]+;)/
   Incomplete = Regexp.compile('&([a-zA-Z][a-zA-Z0-9]*|#[0-9]*)?|' +
                               '<([a-zA-Z][^<>]*|/([a-zA-Z][^<>]*)?|' +
                               '![^<>]*)?')
 
-  Entityref = /&([a-zA-Z][-.a-zA-Z0-9]*)[^-.a-zA-Z0-9]/
-  Charref = /&#([0-9]+)[^0-9]/
+  Entityref = /(\s?)&([a-zA-Z]+);(\s?)/
+  Charref = /(\s?)&#([0-9]+);(\s?)/
 
   Starttagopen = /<[>a-zA-Z]/
   Endtagopen = /<\/[<>a-zA-Z]/
@@ -25,34 +25,7 @@ class SGMLParser
                             '|[-~a-zA-Z0-9,./:+*%?!()_#=]*))?')
 
   Entitydefs =
-    {'lt'=>'<', 'gt'=>'>', 'amp'=>'&', 'quot'=>'"', 'apos'=>'\'',
-    'rsquo' => '\'',
-    '#39' => '\'',
-    'nbsp' => ' ',
-    'ouml' => 'ö', 'Ouml' => 'Ö', 'uuml' => 'ü', 'Uuml' => 'Ü',
-    'auml' => 'ä', 'Auml' => 'Ä', 'szlig' => 'ß',
-    'Ccedil' => 'Ç',
-    'ecirc' => 'ê',
-    'acirc' => 'â',
-    'atilde' => 'ã',
-    'aring' => 'å',
-    'aelig' => 'æ',
-    'agrave' => 'à',
-    'aacute' => 'á',
-    'Ugrave' => 'Ù',
-    'Uacute' => 'Ú',
-    'icirc' => 'î',
-    'iuml' => 'ï',
-    'ntilde' => 'ñ',
-    'ocirc' => 'ô',
-    'ograve' => 'ò',
-    'oacute' => 'ó',
-    'otilde' => 'õ',
-    'ugrave' => 'ù',
-    'uacute' => 'ú',
-    'ucirc' => 'û',
-    'yacute' => 'ý'
-    }
+    {'lt'=>'<', 'gt'=>'>', 'amp'=>'&', 'quot'=>'"', 'apos'=>'\''}
 
   def initialize(verbose=false)
     @verbose = verbose
@@ -150,13 +123,17 @@ class SGMLParser
       elsif rawdata[i] == ?& #
         if rawdata.index(Charref, i) == i
           i += $&.length
-          handle_charref($1)
+          handle_whitespace($1) if $1.length > 0
+          handle_charref($2)
+          handle_whitespace($3) if $3.length > 0
           i -= 1 unless rawdata[i-1] == ?;
           next
         end
         if rawdata.index(Entityref, i) == i
           i += $&.length
-          handle_entityref($1)
+          handle_whitespace($1) if $1.length > 0
+          handle_entityref($2)
+          handle_whitespace($3) if $3.length > 0
           i -= 1 unless rawdata[i-1] == ?;
           next
         end
@@ -281,8 +258,7 @@ class SGMLParser
         end
         return
       end
-      found = @stack.size - (@stack.reverse.index(tag)+1)
-      #found = @stack.index(tag) #or @stack.length
+      found = @stack.index(tag) #or @stack.length
     end
     while @stack.length > found
       tag = @stack[-1]
@@ -338,6 +314,9 @@ class SGMLParser
       return
     end
   end
+  
+  def handle_whitespace(data)
+  end
 
   def handle_data(data)
   end
@@ -349,10 +328,8 @@ class SGMLParser
   end
 
   def unknown_starttag(tag, attrs)
-    puts "Unknown starttag #{tag}"
   end
   def unknown_endtag(tag)
-    puts "Unknown starttag #{tag}"
   end
   def unknown_charref(ref)
   end

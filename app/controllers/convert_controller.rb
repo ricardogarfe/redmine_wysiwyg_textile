@@ -165,7 +165,9 @@ class HTMLFormatter< RedCloth3
 
 class ConvertController < ApplicationController
   unloadable
-      
+  
+  attr :text, true
+  
   def wysiwygtohtmltotextile
     #@text=params[:content][:text]
     @text = params[:convert_content] 
