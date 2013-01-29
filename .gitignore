@@ -1,3 +1,6 @@
 # Eclipse project files
 .project
 .settings
+
+# Files from system
+*.~
