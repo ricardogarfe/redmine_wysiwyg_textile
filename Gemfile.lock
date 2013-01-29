@@ -7,7 +7,6 @@ GEM
   remote: http://rubygems.org/
   specs:
     RedCloth (4.2.9)
-    html2textile (1.0.0.beta2)
     rake (0.9.6)
     test-unit (2.5.4)
 
@@ -16,7 +15,6 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth (~> 4.2)
-  html2textile (~> 1.0.0.beta2)
   rake (~> 0.9)
   redmine_wysiwyg_textile!
   test-unit (~> 2.5.4)
