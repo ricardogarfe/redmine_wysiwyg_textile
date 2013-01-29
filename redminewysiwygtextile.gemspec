@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.files        = Dir.glob("{lib}/**/*") + %w(example.rb README.mdown)
 
   s.add_development_dependency('rake', "~> 0.9")
-  s.add_development_dependency('html2textile', "~> 1.0.0.beta2")
+# s.add_development_dependency('html2textile', "~> 1.0.0.beta2")
   s.add_development_dependency('RedCloth', "~> 4.2")
   s.add_development_dependency('test-unit', "~> 2.5.4")
 
