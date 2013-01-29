@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/ricardogarfe/redmine_wysiwyg_textile.png?branch=convert-html-to-textile)](https://travis-ci.org/ricardogarfe/redmine_wysiwyg_textile)
+
 Redmine Wysiwyg Textile Editor
 ===============================
 
