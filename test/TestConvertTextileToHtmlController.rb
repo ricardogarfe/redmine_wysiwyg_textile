@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'test/unit'
 require 'RedCloth'
-require 'html2textile'
+require './lib/html2textile'
 
 class ConvertTextileToHtmlTest < Test::Unit::TestCase
 
