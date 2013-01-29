@@ -1,5 +1,5 @@
 Redmine Wysiwyg Textile Editor
-=================
+===============================
 
 A TinyMCE test application for Textile wiki pages.
 
@@ -19,13 +19,36 @@ Usage
 
 When editing a wiki page a radio button will be displayed below the Save button. This radio button allows the user to switch between the standard redmine textile editor and the tinymce wysiwyg editor.
 
+Requirements
+-------------
+
+Install required gems:
+
+* test/unit
+* RedCloth
+* html2textile
+
+Using gem install command:
+
+	gem install <gem-name>
+
+Test
+-----
+
+Tests are placed in ``test`` directory. Using Unittest gem to check features and debug conversion errors.
+
+* TestConvertController.rb: this is the main test.
+
+The other files are only test samples to learning how to test in ruby.
+ 
 History
+--------
 
-12 Oct 2010 - v0.11 - fixed bug related to saving raw html in Wysiwyg mode.
-14 Oct 2010 - v0.12 - preview now works in wysiwyg mode.
-14 Oct 2010 - v0.13 - preview now works for google chrome and IE
-14 Oct 2010 - v0.14 - removed P. from html to textile, replaced with just a return (\n)
-2011 - minor enhancements
-2012 - updated for redmine 2.0
+* 12 Oct 2010 - v0.11 - fixed bug related to saving raw html in Wysiwyg mode.
+* 14 Oct 2010 - v0.12 - preview now works in wysiwyg mode.
+* 14 Oct 2010 - v0.13 - preview now works for google chrome and IE
+* 14 Oct 2010 - v0.14 - removed P. from html to textile, replaced with just a return (\n)
+* 2011 - minor enhancements
+* 2012 - updated for redmine 2.0
+* 2013 - Added Tests for Textile to html conversions and html to Textile.
 
-    
